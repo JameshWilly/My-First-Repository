@@ -1,8 +1,25 @@
 <?php
+
 require('header.php');
 
 wp_enqueue_style('thickbox'); 
 wp_enqueue_script('thickbox'); 
+
+/* Name:- Manish Dakhara  */
+/* Date :- 1-1-2016  */
+/* Role :- Changes on Design */
+
+?>
+
+<link href="<?php echo $pluginDirStore;?>admin_new/dist/custom_css.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+#select_supplier_name .select2 ,#select_catlog_name .select2 ,#select_status .select2 
+{
+  width: 100% !important;
+}
+
+</style>
+<?php
 
 
 if($_REQUEST['select_bulk'])
@@ -54,9 +71,9 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
   $inv_code= $client->call('Album_List',$web_inv_code); //call webservice with array parameter      
   
   $catalog_list = json_decode($inv_code); 
- // echo "<pre>";print_r($catalog_list);die;
   
 
+  
   if($catalog_list){
   
     
@@ -74,9 +91,8 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
         {     
           $whol_flag=1;
         }
-		
 		$supplier_id=$wpdb->get_var("SELECT * FROM `supplier` where supplier_name like '%".$catalog->supplier_name."%'");
-          echo "SELECT * FROM `supplier` where supplier_name like '%".$catalog->supplier_name."%'";die;
+          echo "SELECT * FROM `supplier` where supplier_name like '%".$catalog->supplier_name."%'";die;          
         $catalog = array(
                  'ass_cid'      => $catalog->catelog_id,
                  'c_name'       => $catalog->catalog_name,
@@ -115,6 +131,8 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
   if(isset($_REQUEST['action']) && $_REQUEST['action']=='single_catalog')
   {
 
+
+
      $catelog_code = $_REQUEST['id'];
     $array_print  = json_decode($client->call('Login',$addshare_array)); //call webservice with array parameter
     $web_inv_code = array('Authentication_Ticket'=>$array_print->Authentication_Ticket,'Album_Id'=>$catelog_code);  
@@ -123,14 +141,15 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
     
     $db_exist_ass_list  = $wpdb->get_col("SELECT ass_no FROM `store_catalog_data` WHERE 1 AND status !=3 AND `cid` LIKE '$catelog_code'");  
     $exist_cat_our_name = $wpdb->get_var("SELECT our_name FROM `catalog` WHERE `ass_cid` LIKE '$catelog_code'"); 
-	$catalog_status = $wpdb->get_var("SELECT status FROM `catalog` WHERE `ass_cid` LIKE '$catelog_code'"); 
+
+    $catalog_status = $wpdb->get_var("SELECT status FROM `catalog` WHERE `ass_cid` LIKE '$catelog_code'"); 
     ?>
 
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
 
-          <h3><i class="glyphicon glyphicon-user"></i>Single Catlog</h3>
+          <h3><i class="fa fa-file-image-o"></i>Single Catlog</h3>
 
           <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i>Catalog Upload</a></li>
@@ -149,9 +168,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
           <input type="hidden" name="action" value="approved_catalog"  />
         <section class="content">
 
-       
-
-                <div class="box box-info" >
+                <div class="box box-primary" >
                   <div class="box-header" >
                     <h3 class="box-title"><i class="glyphicon glyphicon-list"></i><?php echo $_REQUEST['c_name']; ?></h3>
                     <div class="box-tools">
@@ -172,11 +189,33 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                 </div>
                 <div class="box-body">
 
-                  <table id="example2" class="table table-bordered table-striped">
+                  <?php
+                   /* if($catalog_status == 1)
+                    {
+                      ?>
+
+                      <div class="bulk_action">
+
+                      <select class="form-control" id="sel_bulk_action" name="sel_bulk_running" >
+                      <option value="-1">Bulk Action</option>
+                      <option value="trash">Trash</option>
+                      <option value="restore">Restore</option>
+
+                      </select>
+
+                      <button type="button" name="block_product_action" id="btn_approved_page_product" value="Apply" class="btn btn-primary" onclick="btn_action_product1()"><i class="glyphicon glyphicon-saved"></i>Apply</button>
+
+                  </div>
+
+                      <?php
+                    }*/
+                  ?>
+
+                  <table id="example2" class="table table-bordered table-striped table-hover">
                     <thead>
                       <tr>
 
-                        <th><input type="checkbox" name="chk_all_grp" id="chk_all_grp" class="minimal"></th>
+                        <th style="padding-right:0px;padding-left:0px" ><input type="checkbox" name="chk_all_grp" id="chk_all_grp" class="minimal1"  ></th>
                         <th>No.</th>
                         <th>Image</th>
                         <th>Title</th>
@@ -198,7 +237,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                       foreach($product_data as $product)
                       {?>
                       <tr>    
-                      <td class="center"><input type="checkbox" class="ckp" name="ckp[]" value="<?php echo $product->ass_no;?>" /></td>
+                      <td class="center"><input type="checkbox" class="ckp1" name="ckp[]" value="<?php echo $product->ass_no;?>" /></td>
                       <td><?php echo  $i; ?></td>
                       <td><a href="<?php echo $product->main_image;?>" class="thickbox"><img src="<?php echo $product->main_image_50_50_thumb; ?>" /></a></td>
                       <td><?php echo $product->titel; ?></td>
@@ -207,12 +246,13 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                       <td><?php echo $product->price; ?></td>
                       <td><?php echo $product->delivery_time; ?></td>
                       <td>
-                      <?php echo ($product->availability =="Available")?'<a class="btn btn-success btn-xs" ><i class="fa fa-check"></i></a>':'<a class="btn btn-danger btn-xs" ><i class="fa fa-close"></i></a>';?>
+                      <?php echo ($product->availability =="Available")?'<i class="glyphicon glyphicon-ok-sign" style="color: green;font-size:20px" title="Available"></i>':'<i class="glyphicon glyphicon-remove-circle
+" style="color: red;font-size:20px" title="Uploaded"></i>';?>
                       </td>
                       <td><?php  echo  $product->color;?></td>
                       <td><?php echo  $product->material;?></td>    
                       <td>
-                        <?php echo (in_array($product->ass_no,$db_exist_ass_list))?'<a class="btn btn-success btn-xs" ><i class="fa fa-check"></i></a>':'<a class="btn btn-danger btn-xs" ><i class="fa fa-close"></i></a>';?>
+                        <?php echo (in_array($product->ass_no,$db_exist_ass_list))?'<i class="glyphicon glyphicon-ok-sign" style="color: green;font-size:20px" title="Available"></i>':'<i class="glyphicon glyphicon-remove-circle" style="color: red;font-size:20px" title="Uploaded"></i>';?>
                       </td>
                       </tr>
                       <?php 
@@ -225,7 +265,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                     <tfoot>
                       <tr>
 
-                        <th><input type="checkbox" name="chk_all_grp" id="chk_all_grp" class="minimal"></th>
+                        <th><input type="checkbox" name="chk_all_grp" id="chk_all_grp" class="minimal1"></th>
                         <th>No.</th>
                         <th>Image</th>
                         <th>Title</th>
@@ -243,27 +283,33 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                     
                   </table>
 
-                  <div class="box-body" >
+                  <div style="clear:both;padding-top:20px;" >
                         <div class="row" >
 
                           <div class="col-md-12">
                           
+                          <div class="col-md-2" style="width: 14%;" >
+                            <label>Enter Catalog Name : </label>
+                          </div>
                           <div class="col-md-3" >
-                            <input type="text" name="txt_cat_name_search" id="txt_cat_name_search" placeholder="Catalog" class="form-control" value="" />
+                            
+                            <input type="text" name="txt_cat_name_search" id="txt_cat_name_search" placeholder="Catalog Name" class="form-control" value="" />
                           </div>
 
                           <div class="col-md-3" >
-                          <input type="button" name="bt_apply" id="bt_apply" value="Check Name" onclick="checkCNameAvailability();" class="btn btn-primary"/>
+
+                            <button type="button" name="bt_apply" id="bt_apply" value="Check Name" onclick="checkCNameAvailability();" class="btn btn-primary" ><i class="fa fa-check">Check Name</i></button>
+                          <!-- <input type="button" name="bt_apply" id="bt_apply" value="Check Name" onclick="checkCNameAvailability();" class="btn btn-primary"/> -->
                           </div>
 
-                          <div class="btn-group btn-group pull-right">
-                            <a href="javascript:history.go(-1)" class="btn btn-danger">Go Back</a>
-                            <button type="button" class="btn btn-success" name="bt_approve" id="bt_approve" >Approved</button>
+                          <div class="pull-right">
+                            <a href="javascript:history.go(-1)" class="btn btn-primary"><i class="fa fa-undo"></i>&nbsp;&nbsp;Go Back</a>
+                            <button type="button" class="btn btn-primary" name="bt_approve" id="bt_approve" ><i class="fa fa-check"></i>Approved</button>
                             
                             <?php
                               $href='?page='.$_REQUEST['page'].'&id='.$_REQUEST['id'].'&c_name='.$_REQUEST['c_name'].'&action=duplicate_catalog';
                             ?>
-                            <a href="<?php echo $href; ?>" class="btn btn-default" name="bt_duplicate" id="bt_duplicate">Duplicate</a>
+                            <a href="<?php echo $href; ?>" class="btn btn-primary" name="bt_duplicate" id="bt_duplicate"><i class="fa fa-copy"></i>&nbsp;&nbsp;Duplicate</a>
                           </div>
 
 
@@ -280,6 +326,14 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
         </section><!-- /.content -->
         </form>
       </div><!-- /.content-wrapper -->
+
+      <script type="text/javascript">
+      $(document).ready(function()
+      {
+        $("select,select.input-sm").select2();
+
+      });
+      </script>
     
     <?php
 
@@ -293,7 +347,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
         <!-- Content Header (Page header) -->
         <section class="content-header">
 
-          <h3><i class="glyphicon glyphicon-user"></i>Mastani</h3>
+          <h3><i class="fa fa-check"></i>Approve Catalog</h3>
 
           <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i>Catalog</a></li>
@@ -314,7 +368,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
   <?php }?>
         <section class="content">
 
-                <div class="box box-info" >
+                <div class="box box-primary" >
                   <div class="box-header" >
                     <h3 class="box-title"><i class="glyphicon glyphicon-list"></i>&nbsp;&nbsp;<?php echo $_REQUEST['c_name'];?></h3>
                     <div class="box-tools">
@@ -364,14 +418,13 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                             </select>
                          </div>
                     </div>
-                     </div> 
+                    <br>
 
-
-                     <div class="box-body" >
+                    
                         <div class="row" >    
 
                          <div class="col-md-2">
-                        <label>	Select Product Type: </label>
+                        <label> Select Product Type: </label>
                         </div>
                           <div class="col-md-3" >
                              <?php 
@@ -392,16 +445,14 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                           </div>
 
                      </div>
-                     </div> 
-                     
+                     <br>
 
 
-                    <div class="box-body" >
                         <div class="row" >  
 
                          <div class="col-md-2">
                          <label>Select SKU Prefix:</label>
-                         </div>	
+                         </div> 
                           <div class="col-md-3" >
                           <?php if(isset($cat_from_db->prefix) && $cat_from_db->prefix!='')
                           { ?>
@@ -422,9 +473,8 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                           </div>
 
                      </div>
-                     </div>     
+                     <br>
 
-                     <div class="box-body" >
                         <div class="row" >
 
                          <div class="col-md-2">
@@ -438,15 +488,15 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                             
                           </div>
                     </div>
-                       </div>
-
-                 <div class="box-body" > 
+                    <br>
+                        <div style="clear: both;padding-top: 19px;"> 
                         <div class="row" >      
                          <div class="col-md-6" >
 
-                          <a href="javascript:history.go(-1)" class="btn btn-danger">Go Back</a>		
+                          <a href="javascript:history.go(-1)" class="btn btn-primary"><i class="fa fa-undo"></i>&nbsp;&nbsp;Go Back</a>    
                           <?php if(1){?>
-                          <input type="submit" name="insert_product_entry" id="insert_product_entry" value="Upload Product" class="btn btn-primary"/>
+                          <button type="submit" name="insert_product_entry" id="insert_product_entry" value="Upload Product" class="btn btn-primary"><i class="glyphicon glyphicon-floppy-disk" ></i>&nbsp;&nbsp;Upload Product</button>
+                          <!-- <input type="submit" name="insert_product_entry" id="insert_product_entry" value="Upload Product" class="btn btn-primary"/> -->
                           <?php } ?>
                      
                           
@@ -456,6 +506,16 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                     </div> 
               </div>
        
+                     
+                     
+                </div> 
+
+                <script type="text/javascript">
+                $(document).ready(function(){
+                  $('select').select2();
+                });
+                  
+                </script>
 
           
         </section><!-- /.content -->
@@ -492,8 +552,10 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
             $last_product_no = 20000;
           }   
           /* store plugin catalog */
-          $catalog = $wpdb->get_row("SELECT * FROM `store_catalog` WHERE `ass_cid` LIKE '".$_REQUEST['id']."'");
-                    $catalog_type='';
+          $catalog    = $wpdb->get_row("SELECT * FROM `store_catalog` WHERE `ass_cid` LIKE '".$_REQUEST['id']."'");
+          $parent_cat_id = $wpdb->get_var("SELECT parent_cat_id FROM `ass_cat_map` WHERE `product_type` LIKE '".$catalog->product_type."'");          
+
+          $catalog_type='';
           if($product_type=='sarees')
           {
             $catalog_type='saree';
@@ -571,33 +633,19 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                 if(file_get_contents($thumb_image)) 
                 {
                 /*commented by vijay for change in webservice of addsharesale on 23_11_2014*/ 
-                /*
-                $color_data[] = $product->primary_color;
-                $color_data[] = $product->secondary_color;
-                $color_data[] = $product->color3;
-                $color_data[] = $product->color4;
-                
-                $material_data[] = $product->primary_material;
-                $material_data[] = $product->secondary_material;
-                $material_data[] = $product->material3;
-                $material_data[] = $product->material4; 
-                
-                $occasion_data[] = $product->primary_occasion;
-                $occasion_data[] = $product->secondary_occasion;
-                */
                 /*commented by vijay for change in webservice of addsharesale on 23_11_2014*/ 
                 
-                $sku    = $sku_prefix.$last_product_no; 
-                $sale_price = fnGetCalPrice($product->price,$product->);
+                $sku    = $sku_prefix.$last_product_no;   
+                //$sale_price = fnGetCalPrice($product->price);  
+                $sale_price = fnGetCalPrice($product->price,$parent_cat_id);        
+
+                /*echo "<pre>";            
+                echo "Sale Price::";              
+                print_r($sale_price);         
+                echo "</pre>";  
+                die;*/      
+
                 $total_sale_price = $total_sale_price + $sale_price;
-                /*just check if image main original price exist on ASS or not  by_vijay start*/
-                /*if(file_exists(str_replace(' ','%20',$product->full_image1)))
-                {
-                  $main_original_image = $product->full_image1; 
-                }else{
-                  $main_original_image = $product->main_image;    
-                }*/
-                /*just check if image main original price exist on ASS or not  by_vijay end*/             
                 
                 $main_original_image  = $product->full_image1;
                 $extra_original_image = "";
@@ -749,22 +797,35 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
 
     ?>
     <style>
-#example1 tr td:nth-child(10) ,#example1 tr td:nth-child(11),
-#example1 tr th:nth-child(10) ,#example1 tr th:nth-child(11) {
-    display: none;
+#example tr td:nth-child(10) ,#example tr td:nth-child(11),
+#example tr th:nth-child(10) ,#example tr th:nth-child(11) {
+    display: none !important;
 }
-#example1_filter
+#example_filter
 {
   display: none;
 }
+#log_table > table
+{
+  width: 100%;
+}
+
+
+
+
 
 </style>
  <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
 
-          <h3><i class="glyphicon glyphicon-user"></i> Catalog List</h3>
+          <h3 style="margin-top:35px;" ><i class="glyphicon glyphicon-th-list"></i>CATALOG LIST 
+            <div class="input-group pull-right" style=" margin-bottom:50px; display: block;">
+            <a href="admin.php?page=store_admin_LT&action=get_catalog&id=2500" class="floatr pull-right btn btn-primary"><i class="fa fa-download"></i>&nbsp;&nbsp;New Catalogs</a>
+           </div>
+         </h3>
 
+          
           <ol class="breadcrumb">
             <li><a href="#"><i class="fa fa-dashboard"></i>Catalog upload</a></li>
             <li><a href="#">ASS catalogs</a></li>
@@ -779,14 +840,14 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
         
         <section class="content">
 
-        <div class="input-group" style=" margin-bottom:50px; display: block;">
-            <a href="admin.php?page=store_admin_LT&action=get_catalog&id=2500" class="floatr pull-right btn btn-info">Get New Catalog From ASS</a>
+        <!-- <div class="input-group" style=" margin-bottom:50px; display: block;">
+            <a href="admin.php?page=store_admin_LT&action=get_catalog&id=2500" class="floatr pull-right btn btn-primary"><i class="fa fa-download"></i>New Catalogs</a>
             
-        </div>
+        </div> -->
 
-        <div class="box box-info" >
+        <div class="box box-primary" >
                   <div class="box-header" >
-                    <h3 class="box-title"><i class="glyphicon glyphicon-list"></i>&nbsp;&nbsp;Filter</h3>
+                    <h3 class="box-title"><i class="glyphicon glyphicon-search" ></i>Search Panel</h3>
                     <div class="box-tools">
                           <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                     </div>
@@ -795,27 +856,53 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                         <div class="row" >
 
                           <div class="col-md-4" >
+
+                            <label>Supplier :</label>
                             <p id="select_supplier_name" ></p>
                             
                           </div>
 
-                          <div class="col-md-2" >
-
+                          <div class="col-md-3" >
+                            <label>Catalog :</label>
                             <p id="select_catlog_name" ></p>
                             
                           </div>
                           <div class="col-md-2" >
-
+                            <label>Status :</label>
                             <p id="select_status" ></p>
                             
                           </div>
-                          <div class="col-md-2" >
-                            <input type="text" name="txt_search" id="txt_bottled_search" class="form-control" value="" placeholder="Type Text" />
+                           <div class="col-md-2">
+
+                               
+                                <label>Date :</label>
+                                <p id="datefilter" style="display: none;"></p>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                      <input type="text" class="btn btn-default" id="daterange-btn" placeholder="Select Date" >
+                                    </div>
+                                </div>    
+                            </div>
+                            <div class="col-md-12">
+                              <hr class="btn-primary">
+                            </div>
+                          <div class="col-md-3 col-md-offset-4" >
+                            <!-- <label>Text :</label>
+                            <input type="text" name="txt_search" id="txt_bottled_search" class="form-control" value="" placeholder="Type Text" /> -->
+                              <label>Search By :</label>
+                             <div class="input-group input-group-sx">
+                                  
+                                  <input type="text" name="txt_search" id="txt_search" class="form-control" value="" placeholder="ASS ID, Catalog ,Supplier">
+                                    <span class="input-group-btn">
+                                     <button type="button" class="btn btn-primary" id="bt_search" ><i class="glyphicon glyphicon-search" style="margin-right: 0px" ></i></button>
+                                    </span>
+                              </div>
                           </div>
+                         
 
                           <!-- <input type="submit" name="bt_apply" id="bt_apply" value="Filter" class="btn btn-primary"/> -->
                          </div>
-                          <div class="row" >
+                         <!--  <div class="row" >
 
                             <div class="col-md-2" style="margin-top: 12px;">
                             <select class="form-control" id="select_bulk" name="select_bulk" >
@@ -827,7 +914,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
                             </div>
 
                             <input type="button" name="bulk_apply" id="bulk_apply" value="Apply" class="btn btn-primary" style="margin-top: 10px;" onclick="btn_action_product()" />
-                        </div>
+                        </div> -->
                     </div> 
 
                  
@@ -837,13 +924,26 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
             <div class="col-xs-12">
               
               <div class="box">
-                <div class="box-header">
-                </div><!-- /.box-header -->
-                <div class="box-body">
-                  <table id="example1" class="table table-bordered table-striped">
+            
+                <div class="box-body table-responsive">
+
+                   <div class="bulk_action" >
+
+                            <select class="form-control" id="select_bulk" name="select_bulk" >
+                            <option value="-1" >Bulk Action</option>
+                            <option value="trash" >Trash</option>
+                            <option value="restore" >Restore</option>
+
+                            </select>
+
+                            <button name="bulk_apply" id="bulk_apply" class="btn btn-primary" onclick="btn_action_product()" ><i class="glyphicon glyphicon-saved" ></i>Apply</button>
+                            <!-- <input type="button" name="bulk_apply" id="bulk_apply" value="Apply" class="btn btn-primary" onclick="btn_action_product()" /> -->
+                        </div>
+
+                  <table id="example" class="table table-bordered table-striped table-hover">
                     <thead>
                       <tr>
-                        <th><input type="checkbox" name="chk_all_grp" id="chk_all_grp" class="minimal"></th>
+                        <th style="padding-right: 0px;padding-left: 0px;" ><input type="checkbox" name="chk_all_grp" id="chk_all_grp" class="minimal"></th>
                         <th>ASS ID</th>
                         <th>Catalog</th>
                         <th>Products</th>
@@ -895,7 +995,7 @@ if(isset($_REQUEST['action']) && $_REQUEST['action']=="get_catalog")
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Catalog:<span id="cat_assin"></span></h4>
+        <h4 class="modal-title" id="myModalLabel">Catalog Process<span id="cat_assin"></span></h4>
       </div>
       <div class="modal-body">
         <div class="log_table" id="log_table"> </div>
@@ -977,8 +1077,8 @@ if($catalogs)
       $c='["'.implode('","', $catlog1).'"]';
 
 
-                                ?>
-<script src="http://jorjoto.in/wp-content/plugins/product-store-mang/admin_new/jquery.dataTables.columnFilter.js" type="text/javascript"></script>
+?>
+<script src="<?php echo plugins_url(); ?>/product-store-mang/admin_new/jquery.dataTables.columnFilter.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 
@@ -988,17 +1088,70 @@ if($catalogs)
 
         $(document).ready(function(){
 
-        $('#example1').dataTable( {
+        $('#example').dataTable( {
         "bProcessing": true,
         "aoColumnDefs": [
                         {  "bVisible": true, "aTargets": [ 0, 6, 8 ] ,"orderable":false},
-
+                        {'className':'dt-td-center',"aTargets": [ 0,5,8 ]},   // for text-align center
+                        {'className':'display_none',"aTargets": [ 9,10 ]}   // for column hide
                     ] ,
+          "sDom":'<"top"irlpf>t<"bottom"irlp>',   // for top-bottom pagination
+          "columns": [
+          { "width": "1%" },    // column width
+          { "width": "2%" },
+          { "width": "10%" },
+          { "width": "1%" },
+          { "width": "10%" },
+          { "width": "2%" },
+          { "width": "25%" },
+          { "width": "5%" },
+          { "width": "2%" },
+          { "visible": true },
+          { "visible": true },
+        ],
+        "language": 
+        {
+          "paginate": 
+          {
+             "previous": "<i class='fa fa-angle-left' ></i>",    // add manual symbols for next and previous
+             "next": "<i class='fa fa-angle-right' ></i>",
+          },
+          "sProcessing": "<div class='overlay'><i class='fa fa-refresh fa-spin'></i></div>",    // adding loader
+         },
         "ordering": true,
-        "order":[[ 7, "desc" ]],
+        "order":[[ 7, "desc" ]],   // setting default sorting
         "bServerSide": true,
+        "autoWidth": false,
+        "scrollX": true,
+        "scrollCollapse": true,
         "iDisplayLength":10,
         "sAjaxSource":  plugin_url+'/product-store-mang/admin_new/ajax/store_admin_pagination.php',
+        "initComplete": function(settings, json) 
+        {
+         $("#select_supplier_name select,#select_catlog_name select,#select_status select").select2({
+          placeholder: "-- Select --",
+         });
+
+          $('.dataTables_scrollBody').css({    // table scrolling
+                    'overflow': 'hidden',
+                    'border': '0'
+                });
+                
+                // Enable TFOOT scoll bars
+                $('.dataTables_scrollFoot').css('overflow', 'auto');
+                
+                // Sync TFOOT scrolling with TBODY
+                $('.dataTables_scrollFoot').on('scroll', function () {
+                    $('.dataTables_scrollBody').scrollLeft($(this).scrollLeft());
+                });  
+         
+        },
+        "fnDrawCallback": function( oSettings ) {
+                $('input[type="checkbox"], input[type="radio"]').iCheck({
+          checkboxClass: 'icheckbox_minimal-blue',
+          radioClass: 'iradio_minimal-blue'
+           });
+       },
        }).columnFilter({aoColumns:[
         null,
         null,
@@ -1007,12 +1160,56 @@ if($catalogs)
         { sSelector: "#select_supplier_name",type:"select",values:<?php echo $b; ?>},
         null,
         null,
-        null,
+        { sSelector: "#datefilter" ,type: "date-range" },
         null,
         { sSelector: "#select_status",type:"select",values:["Pending","Uploaded","Running","Trash"]},
         ]});
 
      });
+
+ $(function () {
+
+  $("#select_bulk,.input-sm").select2();
+
+
+ });
+
+ $(function() 
+ {
+          $('input[type="checkbox"], input[type="radio"]').iCheck({
+          checkboxClass: 'icheckbox_minimal-blue',
+          radioClass: 'iradio_minimal-blue'
+          });
+ });
+
+ 
+
+        $('#daterange-btn').daterangepicker(
+        {
+            ranges: {
+              'Today': [moment(), moment()],
+              'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+              'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+              'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+              'This Month': [moment().startOf('month'), moment().endOf('month')],
+              'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            locale: {
+                format: 'DD-MM-YYYY',
+            },
+            startDate: moment().subtract(29, 'days'),
+            endDate: moment()
+        },
+        function (start, end) {
+          var columnno = $('#datefilter .date_range_filter').attr('id').replace(/[^0-9]/gi, '');
+          $('#datefilter #example_range_from_'+columnno).val(start.format('DD-MM-YYYY'));
+          $('#datefilter #example_range_to_'+columnno).val(end.format('DD-MM-YYYY'));
+          $('#reportrange span').html(start.format('D MMMM, YYYY') + ' ~ ' + end.format('D MMMM, YYYY'));
+          $("#example_range_to_"+columnno).trigger('change');
+
+          $('#daterange-btn').val(start.format('DD-MM-YYYY') + ' ~ ' + end.format('DD-MM-YYYY'));
+        }
+    );
 
 
       function btn_action_product()
@@ -1072,44 +1269,86 @@ if($catalogs)
             });
        }
 
-       $('#txt_bottled_search').keyup(function()
+       
+       /*$('#txt_bottled_search').keyup(function()
        {
            $('.input-sm').val($(this).val());
            $('.input-sm').keyup();
 
-       });
+       });*/
+
+      $('#bt_search').click(function()
+      {
+          var search_val=jQuery('#txt_search').val();
+
+          $('.input-sm').val(search_val);
+          $('.input-sm').keyup();
+
+      });
+
+
+
 
 $(document).ready(function() {
-           $('.minimal').click(function(event) { 
 
-        if(this.checked) { // check select status
-            $('.ckp').each(function() { //loop through each checkbox
-                this.checked = true;  //select all checkboxes with class "checkbox1" 
-                             
-            });
-        }else{
-            $('.ckp').each(function() { //loop through each checkbox
-                this.checked = false; //deselect all checkboxes with class "checkbox1"   
-
-            });        
-        }
-    });
 
            $('#example2').DataTable({
           "paging": true,
-          "lengthChange": false,
           "searching": false,
           "ordering": true,
           "info": true,
           "scrollX":"100%",
-          "autoWidth": true,
-          "columnDefs": [
+          "autoWidth": false,
+          "initComplete": function(settings, json) 
+         {
+
+          $('.dataTables_scrollBody').css({
+                    'overflow': 'hidden',
+                    'border': '0'
+                });
+                
+                // Enable TFOOT scoll bars
+                $('.dataTables_scrollFoot').css('overflow', 'auto');
+                
+                // Sync TFOOT scrolling with TBODY
+                $('.dataTables_scrollFoot').on('scroll', function () {
+                    $('.dataTables_scrollBody').scrollLeft($(this).scrollLeft());
+                });  
+         
+        },
+          "language": 
+          {
+            "paginate": 
+            {
+             "previous": "<i class='fa fa-angle-left' ></i>",
+             "next": "<i class='fa fa-angle-right' ></i>",
+            }
+           },
+            "columnDefs": [
           {
           "targets": [0,2,8,11],
            orderable: false,
            visible: true,
-          }
+          },
+          {'className':'dt-td-center',"aTargets": [ 0,8,11 ]}
           ],
+           "columns": [
+            { "width": "1%" },
+            { "width": "1%" },
+            { "width": "7%" },
+            { "width": "20%" },
+            null,
+            null,
+            null,
+            null,
+            { "width": "2%" },
+            null,
+            null,
+            { "width": "2%" },
+          ],
+         
+
+          "sDom":'<"top"irlpf>t<"bottom"irlp>',
           "aaSorting": [],
 
         });
@@ -1161,13 +1400,49 @@ function checkCNameAvailability()
   
 }
 
+
+     var triggeredByChild = false;
+      jQuery(document).on('ifChecked', '.minimal', function (event)
+      {
+        $('.ckp').iCheck('check');
+        triggeredByChild = false;
+      });
+
+      jQuery(document).on('ifUnchecked', '.minimal', function (event)
+      {
+        if (!triggeredByChild) 
+        {
+        $('.ckp').iCheck('uncheck');
+        }
+        triggeredByChild = false;
+      });
+
+      
+
+      var triggeredByChild1 = false;
+      jQuery(document).on('ifChecked', '.minimal1', function (event)
+      {
+        $('.ckp1').iCheck('check');
+        triggeredByChild1 = false;
+      });
+
+      jQuery(document).on('ifUnchecked', '.minimal1', function (event)
+      {
+        if (!triggeredByChild1) 
+        {
+        $('.ckp1').iCheck('uncheck');
+        }
+        triggeredByChild1 = false;
+      });
+
+
  $('#bt_approve').on('click',function(event){
           
       event.preventDefault();
             
             if($('#txt_cat_name_search').val()!='')
             {
-            if($('.ckp:checked').length) {
+            if($('.ckp1:checked').length) {
        
         $('#frm_approve_catlog').submit();    
       }
@@ -1184,6 +1459,40 @@ function checkCNameAvailability()
                     return false;
             }                                
     });
+
+
+  function btn_action_product1()
+      {
+      
+      if($('.ckp1:checked').length) {
+        var chkId = '';
+        $('.ckp1:checked').each(function() {
+        chkId += $(this).val() + ",";
+        });
+        chkId =  chkId.slice(0,-1);
+        
+      
+        if($('#select_bulk').val() == -1)
+        {
+           //alert("Please select bulk action.");  
+           jQuery('#myModal_warning').modal('show');
+           jQuery('#msg_lbl').html('Please select bulk action.');
+           return false;
+        }
+        else
+        {
+            //$('#selected_product').val(chkId);
+          $('#frm_approve_catlog').submit();   
+        }
+      }
+      else {  
+        jQuery('#myModal_warning').modal('show');
+        jQuery('#msg_lbl').html('Please select catalog from below list for apply bulk action.');
+        //alert('Please select catalog from below list for apply bulk action.');
+        return false;
+      }
+      return false;
+    }
       
    
     </script>
